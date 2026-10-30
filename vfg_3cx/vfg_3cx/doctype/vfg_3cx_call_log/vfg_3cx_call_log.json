@@ -1,0 +1,172 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-06-04 05:06:57.603445",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "call_id",
+  "direction",
+  "status",
+  "col_a",
+  "from_number",
+  "to_number",
+  "extension",
+  "time_sec",
+  "start_time",
+  "end_time",
+  "col_b",
+  "duration",
+  "recording_url",
+  "link_sec",
+  "contact",
+  "lead",
+  "col_c",
+  "customer",
+  "agent",
+  "notes_sec",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "call_id",
+   "fieldtype": "Data",
+   "label": "3CX Call ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "label": "Direction",
+   "options": "\nInbound\nOutbound"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nRinging\nAnswered\nMissed\nCompleted\nFailed"
+  },
+  {
+   "fieldname": "col_a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_number",
+   "fieldtype": "Data",
+   "label": "From"
+  },
+  {
+   "fieldname": "to_number",
+   "fieldtype": "Data",
+   "label": "To"
+  },
+  {
+   "fieldname": "extension",
+   "fieldtype": "Data",
+   "label": "Extension"
+  },
+  {
+   "fieldname": "time_sec",
+   "fieldtype": "Section Break",
+   "label": "Timing"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "col_b",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Duration",
+   "label": "Duration (sec)"
+  },
+  {
+   "fieldname": "recording_url",
+   "fieldtype": "Data",
+   "label": "Recording URL"
+  },
+  {
+   "fieldname": "link_sec",
+   "fieldtype": "Section Break",
+   "label": "Linked Records"
+  },
+  {
+   "fieldname": "contact",
+   "fieldtype": "Link",
+   "label": "Contact",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "Lead"
+  },
+  {
+   "fieldname": "col_c",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "agent",
+   "fieldtype": "Link",
+   "label": "Agent (User)",
+   "options": "User"
+  },
+  {
+   "fieldname": "notes_sec",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-04 05:41:10.729519",
+ "modified_by": "Administrator",
+ "module": "VFG 3CX",
+ "name": "VFG 3CX Call Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "from_number",
+ "track_changes": 1
+}

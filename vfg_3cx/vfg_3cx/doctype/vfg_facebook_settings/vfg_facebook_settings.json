@@ -1,0 +1,110 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-23 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "cred_sec",
+  "app_id",
+  "verify_token",
+  "col1",
+  "app_secret",
+  "pages_sec",
+  "pages",
+  "lead_sec",
+  "lead_owner",
+  "lead_source"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "cred_sec",
+   "fieldtype": "Section Break",
+   "label": "Facebook App Credentials"
+  },
+  {
+   "fieldname": "app_id",
+   "fieldtype": "Data",
+   "label": "App ID"
+  },
+  {
+   "description": "Koi bhi random string (e.g. vfg-fb-2026). Yehi value Facebook webhook setup me 'Verify Token' field me daalni hai.",
+   "fieldname": "verify_token",
+   "fieldtype": "Data",
+   "label": "Webhook Verify Token"
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "app_secret",
+   "fieldtype": "Password",
+   "label": "App Secret"
+  },
+  {
+   "description": "Apni Facebook page(s) ka Page ID aur Page Access Token yahan add karein. Webhook aane par incoming page_id ko yahan match kar ke uska token use hota hai.",
+   "fieldname": "pages_sec",
+   "fieldtype": "Section Break",
+   "label": "Facebook Pages"
+  },
+  {
+   "fieldname": "pages",
+   "fieldtype": "Table",
+   "label": "Pages",
+   "options": "VFG Facebook Page"
+  },
+  {
+   "fieldname": "lead_sec",
+   "fieldtype": "Section Break",
+   "label": "New Lead Defaults"
+  },
+  {
+   "description": "Optional. Facebook se bani nayi Lead is user ko assign/owner hogi.",
+   "fieldname": "lead_owner",
+   "fieldtype": "Link",
+   "label": "Default Lead Owner",
+   "options": "User"
+  },
+  {
+   "description": "Optional. Agar set kiya to nayi Lead par yeh source lag jayega (Lead Source doctype me pehle se mojood hona chahiye).",
+   "fieldname": "lead_source",
+   "fieldtype": "Link",
+   "label": "Lead Source",
+   "options": "Lead Source"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-06-23 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VFG 3CX",
+ "name": "VFG Facebook Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

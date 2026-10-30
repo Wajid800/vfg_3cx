@@ -1,0 +1,137 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Form I-9 — Section 1") }}{% endblock %}
+
+{% block page_content %}
+<style>
+	.i9-wrap { max-width: 820px; margin: 0 auto; }
+	.i9-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+	.i9-grid .full { grid-column: 1 / -1; }
+	.i9-field label { font-size: 12px; color: #4a5560; display: block; margin-bottom: 3px; }
+	.i9-card { border: 1px solid #d1d8dd; border-radius: 8px; padding: 20px; background: #fbfbfb; margin-bottom: 18px; }
+	.i9-card h4 { margin: 0 0 14px; }
+	#i9-pad { border: 1px dashed #9aa4ad; border-radius: 6px; background: #fff; width: 100%; height: 180px; touch-action: none; display: block; }
+	.i9-hint { color: #6c7680; font-size: 12px; }
+	.i9-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+	.i9-done { text-align: center; padding: 40px 16px; }
+	.i9-done .tick { font-size: 46px; }
+	@media (max-width: 600px){ .i9-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="i9-wrap">
+{% if state == "invalid" %}
+	<div class="i9-done"><div class="tick">⚠️</div><h4>{{ _("Invalid or expired link") }}</h4></div>
+
+{% elif state == "signed" %}
+	<div class="i9-done"><div class="tick">✅</div>
+		<h4>{{ _("You have already filled and signed this form.") }}</h4>
+		<p class="text-muted">{{ _("No further action is needed. Your employer will complete the remaining verification.") }}</p></div>
+
+{% else %}
+	<h3 style="margin-bottom:6px;">{{ _("Employment Eligibility Verification — Form I-9") }}</h3>
+	<p class="i9-hint" style="margin-bottom:18px;">{{ _("Please complete Section 1 and sign below. All information is confidential.") }}</p>
+
+	<div class="i9-card">
+		<h4>{{ _("Your Information") }}</h4>
+		<div class="i9-grid">
+			<div class="i9-field"><label>{{ _("First Name (Given Name)") }} *</label><input class="form-control" data-i9 name="employee_first_name" value="{{ d.employee_first_name or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Last Name (Family Name)") }} *</label><input class="form-control" data-i9 name="employee_last_name" value="{{ d.employee_last_name or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Middle Initial") }}</label><input class="form-control" data-i9 name="employee_middle_initial" value="{{ d.employee_middle_initial or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Other Last Names Used") }}</label><input class="form-control" data-i9 name="other_last_names_used" value="{{ d.other_last_names_used or '' }}"></div>
+			<div class="i9-field full"><label>{{ _("Address (Street Number and Name)") }}</label><input class="form-control" data-i9 name="address_line1" value="{{ d.address_line1 or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Apt. Number") }}</label><input class="form-control" data-i9 name="apartment_number" value="{{ d.apartment_number or '' }}"></div>
+			<div class="i9-field"><label>{{ _("City or Town") }}</label><input class="form-control" data-i9 name="city" value="{{ d.city or '' }}"></div>
+			<div class="i9-field"><label>{{ _("State") }} ({{ _("2-letter") }})</label><input class="form-control" data-i9 name="state" maxlength="2" value="{{ d.state or '' }}"></div>
+			<div class="i9-field"><label>{{ _("ZIP Code") }}</label><input class="form-control" data-i9 name="zip_code" value="{{ d.zip_code or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Date of Birth") }}</label><input type="date" class="form-control" data-i9 name="date_of_birth" value="{{ d.date_of_birth or '' }}"></div>
+			<div class="i9-field"><label>{{ _("U.S. Social Security Number") }}</label><input class="form-control" data-i9 name="ssn" value="{{ d.ssn or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Email Address") }}</label><input class="form-control" data-i9 name="personal_email" value="{{ d.personal_email or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Telephone Number") }}</label><input class="form-control" data-i9 name="cell_number" value="{{ d.cell_number or '' }}"></div>
+		</div>
+	</div>
+
+	<div class="i9-card">
+		<h4>{{ _("Citizenship / Immigration Status") }}</h4>
+		<div class="i9-field full" style="margin-bottom:12px;">
+			<label>{{ _("I attest that I am") }} *</label>
+			<select class="form-control" id="citizenship_status" data-i9 name="citizenship_status">
+				<option value="">{{ _("-- Select --") }}</option>
+				<option value="A citizen of the United States">1. {{ _("A citizen of the United States") }}</option>
+				<option value="A noncitizen national of the United States">2. {{ _("A noncitizen national of the United States") }}</option>
+				<option value="A lawful permanent resident">3. {{ _("A lawful permanent resident") }}</option>
+				<option value="An alien authorized to work">4. {{ _("An alien authorized to work") }}</option>
+			</select>
+		</div>
+		<div id="i9-immig" class="i9-grid" style="display:none;">
+			<div class="i9-field"><label>{{ _("USCIS A-Number") }}</label><input class="form-control" data-i9 name="uscis_a_number" value="{{ d.uscis_a_number or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Form I-94 Admission Number") }}</label><input class="form-control" data-i9 name="i94_admission_number" value="{{ d.i94_admission_number or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Authorized to Work Until") }}</label><input type="date" class="form-control" data-i9 name="work_authorized_until" value="{{ d.work_authorized_until or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Foreign Passport Number") }}</label><input class="form-control" data-i9 name="foreign_passport_number" value="{{ d.foreign_passport_number or '' }}"></div>
+			<div class="i9-field"><label>{{ _("Country of Issuance") }}</label><input class="form-control" data-i9 name="passport_country_of_issuance" value="{{ d.passport_country_of_issuance or '' }}"></div>
+		</div>
+	</div>
+
+	<div class="i9-card">
+		<h4>{{ _("Signature") }}</h4>
+		<canvas id="i9-pad"></canvas>
+		<div class="i9-hint">{{ _("Draw your signature above using your mouse or finger.") }}</div>
+		<div class="i9-actions">
+			<button class="btn btn-default btn-sm" id="i9-clear">{{ _("Clear") }}</button>
+			<button class="btn btn-primary" id="i9-submit">{{ _("Submit") }}</button>
+			<span id="i9-msg" class="i9-hint"></span>
+		</div>
+	</div>
+
+	<div class="i9-done" id="i9-thanks" style="display:none;">
+		<div class="tick">✅</div><h4>{{ _("Thank you! Your information has been submitted.") }}</h4>
+	</div>
+
+	<script>
+	(function () {
+		const token = {{ token | tojson }};
+		const immig = document.getElementById("i9-immig");
+		const cz = document.getElementById("citizenship_status");
+		cz.value = {{ (d.citizenship_status or "") | tojson }};
+		function toggleImmig() {
+			const v = cz.value;
+			immig.style.display = (v === "A lawful permanent resident" || v === "An alien authorized to work") ? "grid" : "none";
+		}
+		cz.addEventListener("change", toggleImmig); toggleImmig();
+
+		// signature pad
+		const canvas = document.getElementById("i9-pad"), ctx = canvas.getContext("2d");
+		let drawing = false, dirty = false, last = null;
+		function resize(){ const r=window.devicePixelRatio||1,w=canvas.offsetWidth,h=canvas.offsetHeight;
+			canvas.width=w*r;canvas.height=h*r;ctx.scale(r,r);ctx.lineWidth=2;ctx.lineCap="round";ctx.strokeStyle="#1a1a1a"; }
+		resize(); window.addEventListener("resize", resize);
+		function pos(e){ const r=canvas.getBoundingClientRect(),p=e.touches?e.touches[0]:e; return {x:p.clientX-r.left,y:p.clientY-r.top}; }
+		function start(e){ drawing=true; last=pos(e); e.preventDefault(); }
+		function move(e){ if(!drawing)return; const p=pos(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; dirty=true; e.preventDefault(); }
+		function end(){ drawing=false; }
+		canvas.addEventListener("mousedown",start); canvas.addEventListener("mousemove",move); window.addEventListener("mouseup",end);
+		canvas.addEventListener("touchstart",start,{passive:false}); canvas.addEventListener("touchmove",move,{passive:false}); canvas.addEventListener("touchend",end);
+		document.getElementById("i9-clear").addEventListener("click", function(){ ctx.clearRect(0,0,canvas.width,canvas.height); dirty=false; });
+
+		document.getElementById("i9-submit").addEventListener("click", function () {
+			const msg = document.getElementById("i9-msg");
+			const data = {};
+			document.querySelectorAll("[data-i9]").forEach(function(el){ data[el.name] = (el.value || "").trim(); });
+			if (!data.employee_first_name || !data.employee_last_name) { msg.textContent = "{{ _('Please enter your first and last name.') }}"; return; }
+			if (!data.citizenship_status) { msg.textContent = "{{ _('Please select your citizenship status.') }}"; return; }
+			if (!dirty) { msg.textContent = "{{ _('Please draw your signature.') }}"; return; }
+			msg.textContent = "{{ _('Submitting…') }}";
+			frappe.call({
+				method: "vfg_3cx.onboarding.submit_i9_section1",
+				args: { token: token, data: JSON.stringify(data), signature: canvas.toDataURL("image/png") },
+				callback(r){ if (r.message && r.message.ok) {
+					document.querySelectorAll(".i9-card").forEach(function(c){ c.style.display="none"; });
+					document.getElementById("i9-thanks").style.display="block";
+				}},
+				error(){ msg.textContent = "{{ _('Something went wrong. Please try again.') }}"; },
+			});
+		});
+	})();
+	</script>
+{% endif %}
+</div>
+{% endblock %}

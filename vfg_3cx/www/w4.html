@@ -1,0 +1,128 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Form W-4") }}{% endblock %}
+
+{% block page_content %}
+<style>
+	.w4-wrap { max-width: 820px; margin: 0 auto; }
+	.w4-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+	.w4-grid .full { grid-column: 1 / -1; }
+	.w4-field label { font-size: 12px; color: #4a5560; display: block; margin-bottom: 3px; }
+	.w4-card { border: 1px solid #d1d8dd; border-radius: 8px; padding: 20px; background: #fbfbfb; margin-bottom: 18px; }
+	.w4-card h4 { margin: 0 0 14px; }
+	#w4-pad { border: 1px dashed #9aa4ad; border-radius: 6px; background: #fff; width: 100%; height: 180px; touch-action: none; display: block; }
+	.w4-hint { color: #6c7680; font-size: 12px; }
+	.w4-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+	.w4-done { text-align: center; padding: 40px 16px; }
+	.w4-done .tick { font-size: 46px; }
+	@media (max-width: 600px){ .w4-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="w4-wrap">
+{% if state == "invalid" %}
+	<div class="w4-done"><div class="tick">⚠️</div><h4>{{ _("Invalid or expired link") }}</h4></div>
+
+{% elif state == "signed" %}
+	<div class="w4-done"><div class="tick">✅</div>
+		<h4>{{ _("You have already filled and signed this form.") }}</h4>
+		<p class="text-muted">{{ _("No further action is needed.") }}</p></div>
+
+{% else %}
+	<h3 style="margin-bottom:6px;">{{ _("Employee's Withholding Certificate — Form W-4") }}</h3>
+	<p class="w4-hint" style="margin-bottom:18px;">{{ _("Complete the form and sign below. Your information is confidential.") }}</p>
+
+	<div class="w4-card">
+		<h4>{{ _("Step 1 — Personal Information") }}</h4>
+		<div class="w4-grid">
+			<div class="w4-field"><label>{{ _("First Name and Middle Initial") }} *</label><input class="form-control" data-w4 name="first_name_mi" value="{{ d.first_name_mi or '' }}"></div>
+			<div class="w4-field"><label>{{ _("Last Name") }} *</label><input class="form-control" data-w4 name="last_name" value="{{ d.last_name or '' }}"></div>
+			<div class="w4-field full"><label>{{ _("Address") }}</label><input class="form-control" data-w4 name="address" value="{{ d.address or '' }}"></div>
+			<div class="w4-field"><label>{{ _("City, State, ZIP") }}</label><input class="form-control" data-w4 name="city_state_zip" value="{{ d.city_state_zip or '' }}"></div>
+			<div class="w4-field"><label>{{ _("Social Security Number") }}</label><input class="form-control" data-w4 name="ssn" value="{{ d.ssn or '' }}"></div>
+			<div class="w4-field full"><label>{{ _("Filing Status") }} *</label>
+				<select class="form-control" data-w4 name="filing_status" id="w4-filing">
+					<option value="">{{ _("-- Select --") }}</option>
+					<option value="Single or Married filing separately">{{ _("Single or Married filing separately") }}</option>
+					<option value="Married filing jointly or Qualifying surviving spouse">{{ _("Married filing jointly or Qualifying surviving spouse") }}</option>
+					<option value="Head of household">{{ _("Head of household") }}</option>
+				</select>
+			</div>
+			<div class="w4-field full"><label><input type="checkbox" data-w4-check name="multiple_jobs"> {{ _("Step 2(c): Only two jobs total (check if applicable)") }}</label></div>
+		</div>
+	</div>
+
+	<div class="w4-card">
+		<h4>{{ _("Step 3 — Claim Dependents") }} <span class="w4-hint">({{ _("leave blank if none") }})</span></h4>
+		<div class="w4-grid">
+			<div class="w4-field"><label>{{ _("Qualifying children under 17 × $2,000") }}</label><input type="number" class="form-control" data-w4 name="step3_qualifying_children" value="{{ d.step3_qualifying_children or '' }}"></div>
+			<div class="w4-field"><label>{{ _("Other dependents × $500") }}</label><input type="number" class="form-control" data-w4 name="step3_other_dependents" value="{{ d.step3_other_dependents or '' }}"></div>
+			<div class="w4-field"><label>{{ _("Total (Step 3)") }}</label><input type="number" class="form-control" data-w4 name="step3_total" value="{{ d.step3_total or '' }}"></div>
+		</div>
+	</div>
+
+	<div class="w4-card">
+		<h4>{{ _("Step 4 — Other Adjustments (optional)") }}</h4>
+		<div class="w4-grid">
+			<div class="w4-field"><label>{{ _("4(a) Other income") }}</label><input type="number" class="form-control" data-w4 name="step4a_other_income" value="{{ d.step4a_other_income or '' }}"></div>
+			<div class="w4-field"><label>{{ _("4(b) Deductions") }}</label><input type="number" class="form-control" data-w4 name="step4b_deductions" value="{{ d.step4b_deductions or '' }}"></div>
+			<div class="w4-field"><label>{{ _("4(c) Extra withholding") }}</label><input type="number" class="form-control" data-w4 name="step4c_extra_withholding" value="{{ d.step4c_extra_withholding or '' }}"></div>
+		</div>
+	</div>
+
+	<div class="w4-card">
+		<h4>{{ _("Step 5 — Signature") }}</h4>
+		<canvas id="w4-pad"></canvas>
+		<div class="w4-hint">{{ _("Draw your signature above using your mouse or finger.") }}</div>
+		<div class="w4-actions">
+			<button class="btn btn-default btn-sm" id="w4-clear">{{ _("Clear") }}</button>
+			<button class="btn btn-primary" id="w4-submit">{{ _("Submit") }}</button>
+			<span id="w4-msg" class="w4-hint"></span>
+		</div>
+	</div>
+
+	<div class="w4-done" id="w4-thanks" style="display:none;">
+		<div class="tick">✅</div><h4>{{ _("Thank you! Your W-4 has been submitted.") }}</h4>
+	</div>
+
+	<script>
+	(function () {
+		const token = {{ token | tojson }};
+		document.getElementById("w4-filing").value = {{ (d.filing_status or "") | tojson }};
+
+		const canvas = document.getElementById("w4-pad"), ctx = canvas.getContext("2d");
+		let drawing=false, dirty=false, last=null;
+		function resize(){ const r=window.devicePixelRatio||1,w=canvas.offsetWidth,h=canvas.offsetHeight;
+			canvas.width=w*r;canvas.height=h*r;ctx.scale(r,r);ctx.lineWidth=2;ctx.lineCap="round";ctx.strokeStyle="#1a1a1a"; }
+		resize(); window.addEventListener("resize", resize);
+		function pos(e){ const r=canvas.getBoundingClientRect(),p=e.touches?e.touches[0]:e; return {x:p.clientX-r.left,y:p.clientY-r.top}; }
+		function start(e){ drawing=true; last=pos(e); e.preventDefault(); }
+		function move(e){ if(!drawing)return; const p=pos(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; dirty=true; e.preventDefault(); }
+		function end(){ drawing=false; }
+		canvas.addEventListener("mousedown",start); canvas.addEventListener("mousemove",move); window.addEventListener("mouseup",end);
+		canvas.addEventListener("touchstart",start,{passive:false}); canvas.addEventListener("touchmove",move,{passive:false}); canvas.addEventListener("touchend",end);
+		document.getElementById("w4-clear").addEventListener("click", function(){ ctx.clearRect(0,0,canvas.width,canvas.height); dirty=false; });
+
+		document.getElementById("w4-submit").addEventListener("click", function () {
+			const msg = document.getElementById("w4-msg");
+			const data = {};
+			document.querySelectorAll("[data-w4]").forEach(function(el){ data[el.name] = (el.value || "").trim(); });
+			document.querySelectorAll("[data-w4-check]").forEach(function(el){ data[el.name] = el.checked ? 1 : 0; });
+			if (!data.first_name_mi || !data.last_name) { msg.textContent = "{{ _('Please enter your name.') }}"; return; }
+			if (!data.filing_status) { msg.textContent = "{{ _('Please select filing status.') }}"; return; }
+			if (!dirty) { msg.textContent = "{{ _('Please draw your signature.') }}"; return; }
+			msg.textContent = "{{ _('Submitting…') }}";
+			frappe.call({
+				method: "vfg_3cx.onboarding.submit_w4",
+				args: { token: token, data: JSON.stringify(data), signature: canvas.toDataURL("image/png") },
+				callback(r){ if (r.message && r.message.ok) {
+					document.querySelectorAll(".w4-card").forEach(function(c){ c.style.display="none"; });
+					document.getElementById("w4-thanks").style.display="block";
+				}},
+				error(){ msg.textContent = "{{ _('Something went wrong. Please try again.') }}"; },
+			});
+		});
+	})();
+	</script>
+{% endif %}
+</div>
+{% endblock %}

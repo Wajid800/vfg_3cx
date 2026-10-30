@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+<Crm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Country="US" Name="VFG ERPNext" Version="1" SupportsEmojis="true">
+  <Number Prefix="AsIs" MaxLength="[MaxLength]" />
+  <Connection MaxConcurrentRequests="2" />
+  <Parameters>
+    <Parameter Name="ReportCallEnabled" Type="Boolean" Editor="String" Title="Enable Call Journaling (save calls to ERPNext)" Default="True" />
+  </Parameters>
+  <Authentication Type="No" />
+  <Scenarios>
+    <!-- Inbound call: look up the caller's number in ERPNext -->
+    <Scenario Id="" Type="REST">
+      <Request Url="https://erp.speciapro.com/api/method/vfg_3cx.api.get_contact_by_number?number=[Number]" MessagePasses="0" RequestEncoding="UrlEncoded" RequestType="Get" ResponseType="Json" />
+      <Rules>
+        <Rule Type="Any">message.id</Rule>
+      </Rules>
+      <Variables>
+        <Variable Name="ContactID" Path="message.id"><Filter /></Variable>
+        <Variable Name="FirstName" Path="message.firstname"><Filter /></Variable>
+        <Variable Name="LastName" Path="message.lastname"><Filter /></Variable>
+        <Variable Name="CompanyName" Path="message.company"><Filter /></Variable>
+        <Variable Name="Email" Path="message.email"><Filter /></Variable>
+        <Variable Name="PhoneBusiness" Path="message.phonebusiness"><Filter /></Variable>
+        <Variable Name="PhoneMobile" Path="message.phonemobile"><Filter /></Variable>
+        <Variable Name="ContactUrl" Path="message.contacturl"><Filter /></Variable>
+      </Variables>
+      <Outputs AllowEmpty="false">
+        <Output Type="ContactID" Passes="0" Value="[ContactID]" />
+        <Output Type="FirstName" Passes="0" Value="[FirstName]" />
+        <Output Type="LastName" Passes="0" Value="[LastName]" />
+        <Output Type="CompanyName" Passes="0" Value="[CompanyName]" />
+        <Output Type="Email" Passes="0" Value="[Email]" />
+        <Output Type="PhoneBusiness" Passes="0" Value="[PhoneBusiness]" />
+        <Output Type="PhoneMobile" Passes="0" Value="[PhoneMobile]" />
+        <Output Type="ContactUrl" Passes="0" Value="[ContactUrl]" />
+        <Output Type="EntityId" Passes="0" Value="[ContactID]" />
+        <Output Type="EntityType" Passes="0" Value="Contacts" />
+      </Outputs>
+    </Scenario>
+
+    <!-- Optional: look up a contact by email address -->
+    <Scenario Id="LookupByEmail" Type="REST">
+      <Request Url="https://erp.speciapro.com/api/method/vfg_3cx.api.get_contact_by_number?email=[Email]" MessagePasses="0" RequestEncoding="UrlEncoded" RequestType="Get" ResponseType="Json" />
+      <Rules>
+        <Rule Type="Any">message.id</Rule>
+      </Rules>
+      <Variables>
+        <Variable Name="ContactID" Path="message.id"><Filter /></Variable>
+        <Variable Name="FirstName" Path="message.firstname"><Filter /></Variable>
+        <Variable Name="LastName" Path="message.lastname"><Filter /></Variable>
+        <Variable Name="CompanyName" Path="message.company"><Filter /></Variable>
+        <Variable Name="Email" Path="message.email"><Filter /></Variable>
+        <Variable Name="PhoneBusiness" Path="message.phonebusiness"><Filter /></Variable>
+        <Variable Name="PhoneMobile" Path="message.phonemobile"><Filter /></Variable>
+        <Variable Name="ContactUrl" Path="message.contacturl"><Filter /></Variable>
+      </Variables>
+      <Outputs AllowEmpty="false">
+        <Output Type="ContactID" Passes="0" Value="[ContactID]" />
+        <Output Type="FirstName" Passes="0" Value="[FirstName]" />
+        <Output Type="LastName" Passes="0" Value="[LastName]" />
+        <Output Type="CompanyName" Passes="0" Value="[CompanyName]" />
+        <Output Type="Email" Passes="0" Value="[Email]" />
+        <Output Type="PhoneBusiness" Passes="0" Value="[PhoneBusiness]" />
+        <Output Type="PhoneMobile" Passes="0" Value="[PhoneMobile]" />
+        <Output Type="ContactUrl" Passes="0" Value="[ContactUrl]" />
+        <Output Type="EntityId" Passes="0" Value="[ContactID]" />
+        <Output Type="EntityType" Passes="0" Value="Contacts" />
+      </Outputs>
+    </Scenario>
+
+    <!-- Call journaling: one scenario per call type, chained. 3CX runs the
+         chain at the end of every call; each scenario fires only for its
+         matching CallType (the rest skip). All post to log_call. -->
+    <Scenario Id="ReportCall" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Inbound,True,False)])]" Url="https://erp.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Inbound</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallMissed" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallMissed" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Missed,True,False)])]" Url="https://erp.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Missed</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallOutbound" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallOutbound" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Outbound,True,False)])]" Url="https://erp.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Outbound</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallNotanswered" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallNotanswered" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Notanswered,True,False)])]" Url="https://erp.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Notanswered</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallVfg" AllowEmpty="true" />
+    </Scenario>
+
+    <!-- Same call journaling, mirrored to the VentureForce HR site
+         (vfg.tboss.info). Chained after the erp.speciapro.com scenarios
+         above so both sites get every call. -->
+    <Scenario Id="ReportCallVfg" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Inbound,True,False)])]" Url="https://vfg.tboss.info/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Inbound</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallVfgMissed" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallVfgMissed" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Missed,True,False)])]" Url="https://vfg.tboss.info/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Missed</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallVfgOutbound" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallVfgOutbound" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Outbound,True,False)])]" Url="https://vfg.tboss.info/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Outbound</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallVfgNotanswered" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallVfgNotanswered" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Notanswered,True,False)])]" Url="https://vfg.tboss.info/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Notanswered</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallCrm" AllowEmpty="true" />
+    </Scenario>
+
+    <!-- Same call journaling, mirrored to crm.speciapro.com. Chained after
+         the vfg.tboss.info scenarios above so all three sites get every call. -->
+    <Scenario Id="ReportCallCrm" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Inbound,True,False)])]" Url="https://crm.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Inbound</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallCrmMissed" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallCrmMissed" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Missed,True,False)])]" Url="https://crm.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Missed</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallCrmOutbound" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallCrmOutbound" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Outbound,True,False)])]" Url="https://crm.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Outbound</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs Next="ReportCallCrmNotanswered" AllowEmpty="true" />
+    </Scenario>
+
+    <Scenario Id="ReportCallCrmNotanswered" Type="REST">
+      <Request SkipIf="[IIf([ReportCallEnabled]!=True,True,[IIf([CallType]!=Notanswered,True,False)])]" Url="https://crm.speciapro.com/api/method/vfg_3cx.api.log_call" MessagePasses="0" RequestContentType="application/json" RequestEncoding="Json" RequestType="Post" ResponseType="Json">
+        <PostValues Key="">
+          <Value Key="number" Passes="1" Type="String">[Number]</Value>
+          <Value Key="agent" Passes="1" Type="String">[Agent]</Value>
+          <Value Key="duration" Passes="1" Type="String">[Duration]</Value>
+          <Value Key="datetime" Passes="1" Type="String">[DateTime]</Value>
+          <Value Key="call_type" Passes="1" Type="String">Notanswered</Value>
+          <Value Key="entity_id" Passes="1" Type="String">[EntityId]</Value>
+          <Value Key="entity_type" Passes="1" Type="String">[EntityType]</Value>
+        </PostValues>
+      </Request>
+      <Variables />
+      <Outputs AllowEmpty="true" />
+    </Scenario>
+  </Scenarios>
+</Crm>

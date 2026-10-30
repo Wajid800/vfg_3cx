@@ -1,0 +1,176 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-04 05:06:57.455835",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "conn_sec",
+  "server_url",
+  "extension",
+  "col1",
+  "extension_password",
+  "wss_url",
+  "api_sec",
+  "api_client_id",
+  "col2",
+  "api_client_secret",
+  "token_sec",
+  "access_token",
+  "token_expires_at",
+  "agents_sec",
+  "agent_extensions",
+  "asterisk_sec",
+  "threecx_ip",
+  "asterisk_realm",
+  "col_ast",
+  "asterisk_conf_path"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "conn_sec",
+   "fieldtype": "Section Break",
+   "label": "Connection"
+  },
+  {
+   "description": "e.g. https://ventureforce.md.3cx.us",
+   "fieldname": "server_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "3CX Server URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "extension",
+   "fieldtype": "Data",
+   "label": "Extension"
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "extension_password",
+   "fieldtype": "Password",
+   "label": "Extension Password"
+  },
+  {
+   "description": "WebSocket URL for browser softphone (WebRTC). Auto-derived from Server URL if blank. e.g. wss://ventureforce.md.3cx.us:5090",
+   "fieldname": "wss_url",
+   "fieldtype": "Data",
+   "label": "WebSocket URL (WSS)"
+  },
+  {
+   "fieldname": "api_sec",
+   "fieldtype": "Section Break",
+   "label": "Call Control API (OAuth)"
+  },
+  {
+   "fieldname": "api_client_id",
+   "fieldtype": "Data",
+   "label": "API Client ID"
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "api_client_secret",
+   "fieldtype": "Password",
+   "label": "API Client Secret"
+  },
+  {
+   "fieldname": "token_sec",
+   "fieldtype": "Section Break",
+   "label": "Token (auto-managed)"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Small Text",
+   "label": "Access Token",
+   "read_only": 1
+  },
+  {
+   "fieldname": "token_expires_at",
+   "fieldtype": "Datetime",
+   "label": "Token Expires At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "agents_sec",
+   "fieldtype": "Section Break",
+   "label": "Agent Extensions"
+  },
+  {
+   "description": "For each agent, provide the User, Extension, ERPNext Password (for browser/phone login), and the 3CX SIP Authentication ID and Password (from the 3CX IP Phone dialog). Click the \"Sync to Asterisk\" button to automatically generate the configuration.",
+   "fieldname": "agent_extensions",
+   "fieldtype": "Table",
+   "label": "Agent Extensions",
+   "options": "VFG 3CX Agent"
+  },
+  {
+   "fieldname": "asterisk_sec",
+   "fieldtype": "Section Break",
+   "label": "Asterisk WebRTC Bridge"
+  },
+  {
+   "default": "167.71.164.210",
+   "description": "he public IP address of the 3CX server \u2014 used in the identify section of pjsip_agents.conf.",
+   "fieldname": "threecx_ip",
+   "fieldtype": "Data",
+   "label": "3CX Server IP"
+  },
+  {
+   "default": "asterisk",
+   "description": "Asterisk  SIP authentication realm. Default: asterisk",
+   "fieldname": "asterisk_realm",
+   "fieldtype": "Data",
+   "label": "Asterisk SIP Realm"
+  },
+  {
+   "fieldname": "col_ast",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "/etc/asterisk/pjsip_agents.conf",
+   "description": "Full path to pjsip_agents.conf file on the server.",
+   "fieldname": "asterisk_conf_path",
+   "fieldtype": "Data",
+   "label": "pjsip_agents.conf Path"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-07-03 01:08:06.613293",
+ "modified_by": "Administrator",
+ "module": "VFG 3CX",
+ "name": "VFG 3CX Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

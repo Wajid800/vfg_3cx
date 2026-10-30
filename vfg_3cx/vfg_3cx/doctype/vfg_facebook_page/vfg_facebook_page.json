@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-23 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "page_id",
+  "page_name",
+  "page_access_token"
+ ],
+ "fields": [
+  {
+   "fieldname": "page_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Page ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "page_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Page Name"
+  },
+  {
+   "description": "Long-lived Page Access Token for this page (used to fetch lead details from Facebook).",
+   "fieldname": "page_access_token",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Page Access Token",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-23 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VFG 3CX",
+ "name": "VFG Facebook Page",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

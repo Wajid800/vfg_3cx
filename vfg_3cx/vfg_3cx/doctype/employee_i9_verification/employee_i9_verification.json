@@ -1,0 +1,337 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:I9-{#####}",
+ "creation": "2026-07-12 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "status",
+  "employee_link",
+  "col_top",
+  "token",
+  "sec1",
+  "employee_first_name",
+  "employee_middle_initial",
+  "employee_last_name",
+  "other_last_names_used",
+  "col_addr",
+  "address_line1",
+  "apartment_number",
+  "city",
+  "state",
+  "zip_code",
+  "sec_personal",
+  "date_of_birth",
+  "ssn",
+  "col_pers",
+  "personal_email",
+  "cell_number",
+  "sec_citizen",
+  "citizenship_status",
+  "col_citizen",
+  "uscis_a_number",
+  "i94_admission_number",
+  "work_authorized_until",
+  "foreign_passport_number",
+  "passport_country_of_issuance",
+  "sec_emp_sign",
+  "employee_signature",
+  "employee_signature_date",
+  "sec2",
+  "first_day_of_employment",
+  "employer_representative_name_title",
+  "col_emp2",
+  "employer_business_name",
+  "employer_business_address",
+  "alternative_procedure_used",
+  "additional_information",
+  "sec_er_sign",
+  "employer_signature",
+  "employer_signature_date",
+  "sec_docs",
+  "documents",
+  "sec_pdf",
+  "filled_pdf"
+ ],
+ "fields": [
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nSent to Employee\nEmployee Signed\nCompleted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_link",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee (Name / ID)"
+  },
+  {
+   "fieldname": "col_top",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "token",
+   "fieldtype": "Data",
+   "label": "Public Link Token",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "sec1",
+   "fieldtype": "Section Break",
+   "label": "Section 1 - Employee Information"
+  },
+  {
+   "fieldname": "employee_first_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "First Name (Given Name)"
+  },
+  {
+   "fieldname": "employee_middle_initial",
+   "fieldtype": "Data",
+   "label": "Middle Initial"
+  },
+  {
+   "fieldname": "employee_last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last Name (Family Name)"
+  },
+  {
+   "fieldname": "other_last_names_used",
+   "fieldtype": "Data",
+   "label": "Other Last Names Used"
+  },
+  {
+   "fieldname": "col_addr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "address_line1",
+   "fieldtype": "Data",
+   "label": "Address (Street Number and Name)"
+  },
+  {
+   "fieldname": "apartment_number",
+   "fieldtype": "Data",
+   "label": "Apt. Number"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City or Town"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "zip_code",
+   "fieldtype": "Data",
+   "label": "ZIP Code"
+  },
+  {
+   "fieldname": "sec_personal",
+   "fieldtype": "Section Break",
+   "label": "Personal"
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth"
+  },
+  {
+   "fieldname": "ssn",
+   "fieldtype": "Data",
+   "label": "U.S. Social Security Number"
+  },
+  {
+   "fieldname": "col_pers",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "personal_email",
+   "fieldtype": "Data",
+   "label": "Email Address",
+   "options": "Email"
+  },
+  {
+   "fieldname": "cell_number",
+   "fieldtype": "Data",
+   "label": "Telephone Number"
+  },
+  {
+   "fieldname": "sec_citizen",
+   "fieldtype": "Section Break",
+   "label": "Citizenship / Immigration Status"
+  },
+  {
+   "fieldname": "citizenship_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nA citizen of the United States\nA noncitizen national of the United States\nA lawful permanent resident\nAn alien authorized to work"
+  },
+  {
+   "fieldname": "col_citizen",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "For lawful permanent resident or alien authorized to work.",
+   "fieldname": "uscis_a_number",
+   "fieldtype": "Data",
+   "label": "USCIS A-Number"
+  },
+  {
+   "fieldname": "i94_admission_number",
+   "fieldtype": "Data",
+   "label": "Form I-94 Admission Number"
+  },
+  {
+   "fieldname": "work_authorized_until",
+   "fieldtype": "Date",
+   "label": "Authorized to Work Until"
+  },
+  {
+   "fieldname": "foreign_passport_number",
+   "fieldtype": "Data",
+   "label": "Foreign Passport Number"
+  },
+  {
+   "fieldname": "passport_country_of_issuance",
+   "fieldtype": "Data",
+   "label": "Country of Issuance"
+  },
+  {
+   "fieldname": "sec_emp_sign",
+   "fieldtype": "Section Break",
+   "label": "Employee Signature"
+  },
+  {
+   "fieldname": "employee_signature",
+   "fieldtype": "Signature",
+   "label": "Signature of Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_signature_date",
+   "fieldtype": "Date",
+   "label": "Signed On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec2",
+   "fieldtype": "Section Break",
+   "label": "Section 2 - Employer Verification"
+  },
+  {
+   "fieldname": "first_day_of_employment",
+   "fieldtype": "Date",
+   "label": "First Day of Employment"
+  },
+  {
+   "description": "Last Name, First Name and Title of Employer or Authorized Representative.",
+   "fieldname": "employer_representative_name_title",
+   "fieldtype": "Data",
+   "label": "Employer Representative (Name & Title)"
+  },
+  {
+   "fieldname": "col_emp2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Dreamchasers Community Services",
+   "fieldname": "employer_business_name",
+   "fieldtype": "Data",
+   "label": "Employer's Business Name"
+  },
+  {
+   "fieldname": "employer_business_address",
+   "fieldtype": "Small Text",
+   "label": "Employer's Business Address"
+  },
+  {
+   "default": "0",
+   "fieldname": "alternative_procedure_used",
+   "fieldtype": "Check",
+   "label": "Alternative DHS Procedure Used"
+  },
+  {
+   "fieldname": "additional_information",
+   "fieldtype": "Small Text",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "sec_er_sign",
+   "fieldtype": "Section Break",
+   "label": "Employer Signature"
+  },
+  {
+   "fieldname": "employer_signature",
+   "fieldtype": "Signature",
+   "label": "Signature of Employer or Authorized Representative"
+  },
+  {
+   "fieldname": "employer_signature_date",
+   "fieldtype": "Date",
+   "label": "Signed On"
+  },
+  {
+   "fieldname": "sec_docs",
+   "fieldtype": "Section Break",
+   "label": "Documents (List A / B / C)"
+  },
+  {
+   "fieldname": "documents",
+   "fieldtype": "Table",
+   "label": "Documents",
+   "options": "Employee I9 Document"
+  },
+  {
+   "fieldname": "sec_pdf",
+   "fieldtype": "Section Break",
+   "label": "Generated Form"
+  },
+  {
+   "fieldname": "filled_pdf",
+   "fieldtype": "Attach",
+   "label": "Filled I-9 PDF",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VFG 3CX",
+ "name": "Employee I9 Verification",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "employee_last_name",
+ "track_changes": 1
+}
