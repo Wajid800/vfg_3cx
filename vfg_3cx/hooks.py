@@ -50,6 +50,7 @@ doctype_js = {
 	"Sales Invoice": "public/js/sales_invoice.js",
 	"Employee I9 Verification": "public/js/employee_i9_verification.js",
 	"Employee W4": "public/js/employee_w4.js",
+	"Employee Onboarding": "public/js/employee_onboarding.js",
 }
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}

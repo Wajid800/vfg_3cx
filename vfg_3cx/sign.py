@@ -1,7 +1,8 @@
-"""Public digital-signature links for documents (Sales Invoice).
+"""Public digital-signature links for documents (Sales Invoice, Employee Onboarding).
 
 Flow:
-  1. An ERPNext user opens a Sales Invoice and clicks "Get Signature Link".
+  1. An ERPNext user opens a Sales Invoice / Employee Onboarding and clicks
+     "Get Signature Link" / "Generate Link".
      -> get_signature_link() creates a VFG Signature Request with a random
         token and a frozen HTML snapshot of the print format, and returns a
         public URL: https://<site>/sign?token=<token>
@@ -30,16 +31,28 @@ def _clean_print_html(html):
     return html
 
 
+# Doctypes that may get a public signing link.
+SIGNABLE_DOCTYPES = ("Sales Invoice", "Employee Onboarding")
+
+
 @frappe.whitelist()
 def get_signature_link(sales_invoice, print_format=None):
-    """Create (or reuse) a pending signature request for a Sales Invoice and
-    return its public signing URL. Caller must be able to read the invoice."""
-    if not frappe.has_permission("Sales Invoice", "read", doc=sales_invoice):
+    """Backwards-compatible entry point used by the Sales Invoice button."""
+    return get_doc_signature_link("Sales Invoice", sales_invoice, print_format)
+
+
+@frappe.whitelist()
+def get_doc_signature_link(doctype, name, print_format=None):
+    """Create (or reuse) a pending signature request for a document and
+    return its public signing URL. Caller must be able to read the document."""
+    if doctype not in SIGNABLE_DOCTYPES:
+        frappe.throw(_("Signature links are not enabled for {0}").format(doctype))
+    if not frappe.has_permission(doctype, "read", doc=name):
         frappe.throw(_("Not permitted"), frappe.PermissionError)
 
     existing = frappe.db.get_value(
         "VFG Signature Request",
-        {"reference_doctype": "Sales Invoice", "reference_name": sales_invoice, "status": "Pending"},
+        {"reference_doctype": doctype, "reference_name": name, "status": "Pending"},
         ["name", "token"],
         as_dict=True,
     )
@@ -47,12 +60,10 @@ def get_signature_link(sales_invoice, print_format=None):
         token = existing.token
     else:
         token = frappe.generate_hash(length=40)
-        html = _clean_print_html(
-            frappe.get_print("Sales Invoice", sales_invoice, print_format=print_format)
-        )
+        html = _clean_print_html(frappe.get_print(doctype, name, print_format=print_format))
         doc = frappe.new_doc("VFG Signature Request")
-        doc.reference_doctype = "Sales Invoice"
-        doc.reference_name = sales_invoice
+        doc.reference_doctype = doctype
+        doc.reference_name = name
         doc.token = token
         doc.status = "Pending"
         doc.document_html = html
@@ -85,13 +96,13 @@ def submit_signature(token, signature, signer_name=None):
     doc.status = "Signed"
     doc.save(ignore_permissions=True)
 
-    _attach_to_invoice(doc, signature)
+    _attach_to_reference(doc, signature)
     frappe.db.commit()
     return {"ok": True}
 
 
-def _attach_to_invoice(doc, signature):
-    """Best-effort: save the signature PNG on the invoice + timeline note."""
+def _attach_to_reference(doc, signature):
+    """Best-effort: save the signature PNG on the signed document + timeline note."""
     try:
         b64 = signature.split(",", 1)[1] if "," in signature else signature
         content = base64.b64decode(b64)
@@ -106,8 +117,8 @@ def _attach_to_invoice(doc, signature):
             }
         ).insert(ignore_permissions=True)
 
-        inv = frappe.get_doc(doc.reference_doctype, doc.reference_name)
-        inv.add_comment(
+        ref = frappe.get_doc(doc.reference_doctype, doc.reference_name)
+        ref.add_comment(
             "Comment",
             _("Digitally signed by {0} on {1} (IP {2}).").format(
                 frappe.utils.escape_html(doc.signer_name or "customer"),
@@ -116,4 +127,4 @@ def _attach_to_invoice(doc, signature):
             ),
         )
     except Exception:
-        frappe.log_error(frappe.get_traceback(), "Signature attach to invoice failed")
+        frappe.log_error(frappe.get_traceback(), "Signature attach failed")
