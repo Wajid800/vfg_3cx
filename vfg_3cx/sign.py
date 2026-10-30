@@ -1,7 +1,8 @@
-"""Public digital-signature links for documents (Sales Invoice, Employee Onboarding).
+"""Public digital-signature links for documents (Sales Invoice, Accounting
+Service Agreement a.k.a. "On-Boarding").
 
 Flow:
-  1. An ERPNext user opens a Sales Invoice / Employee Onboarding and clicks
+  1. An ERPNext user opens a Sales Invoice / Accounting Service Agreement and clicks
      "Get Signature Link" / "Generate Link".
      -> get_signature_link() creates a VFG Signature Request with a random
         token and a frozen HTML snapshot of the print format, and returns a
@@ -32,7 +33,18 @@ def _clean_print_html(html):
 
 
 # Doctypes that may get a public signing link.
-SIGNABLE_DOCTYPES = ("Sales Invoice", "Employee Onboarding")
+SIGNABLE_DOCTYPES = ("Sales Invoice", "Accounting Service Agreement")
+
+# Fields on the signed document to fill once the client signs
+# (signature / signer name / date / "signed" checkbox).
+SIGNATURE_FIELD_MAP = {
+    "Accounting Service Agreement": {
+        "signature": "client_signature",
+        "name": "client_name",
+        "date": "client_date",
+        "flag": "ias",
+    },
+}
 
 
 @frappe.whitelist()
@@ -97,8 +109,24 @@ def submit_signature(token, signature, signer_name=None):
     doc.save(ignore_permissions=True)
 
     _attach_to_reference(doc, signature)
+    _fill_signature_fields(doc, signature)
     frappe.db.commit()
     return {"ok": True}
+
+
+def _fill_signature_fields(doc, signature):
+    """Best-effort: copy the signature into the document's own signature
+    fields. Uses db.set_value so it also works on submitted documents."""
+    fmap = SIGNATURE_FIELD_MAP.get(doc.reference_doctype)
+    if not fmap:
+        return
+    try:
+        values = {fmap["signature"]: signature, fmap["date"]: frappe.utils.today(), fmap["flag"]: 1}
+        if doc.signer_name:
+            values[fmap["name"]] = doc.signer_name
+        frappe.db.set_value(doc.reference_doctype, doc.reference_name, values)
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "Signature field update failed")
 
 
 def _attach_to_reference(doc, signature):

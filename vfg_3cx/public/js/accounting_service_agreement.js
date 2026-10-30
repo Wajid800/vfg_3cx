@@ -1,8 +1,9 @@
-// Adds a "Generate Link" button to Employee Onboarding. It creates a public,
-// token-protected signing page and shows the URL (copy / open) to send to the
-// customer or client. They sign without any ERPNext login (see vfg_3cx.sign).
+// Adds a "Generate Link" button to Accounting Service Agreement ("On-Boarding").
+// It creates a public, token-protected signing page and shows the URL (copy /
+// open) to send to the client. They sign without any ERPNext login; the
+// signature is written back to Client Signature (see vfg_3cx.sign).
 
-frappe.ui.form.on("Employee Onboarding", {
+frappe.ui.form.on("Accounting Service Agreement", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 
