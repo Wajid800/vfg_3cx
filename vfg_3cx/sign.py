@@ -68,11 +68,15 @@ def get_doc_signature_link(doctype, name, print_format=None):
         ["name", "token"],
         as_dict=True,
     )
+    html = _clean_print_html(frappe.get_print(doctype, name, print_format=print_format))
     if existing:
+        # Same link, but refresh the snapshot so it reflects the latest
+        # document data / print format.
         token = existing.token
+        frappe.db.set_value("VFG Signature Request", existing.name, "document_html", html)
+        frappe.db.commit()
     else:
         token = frappe.generate_hash(length=40)
-        html = _clean_print_html(frappe.get_print(doctype, name, print_format=print_format))
         doc = frappe.new_doc("VFG Signature Request")
         doc.reference_doctype = doctype
         doc.reference_name = name
